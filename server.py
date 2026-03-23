@@ -12,8 +12,8 @@ from flask import Flask, request, jsonify, send_from_directory
 from flask_cors import CORS
 from openai import OpenAI
 
-app = Flask(__name__, static_folder=".")
-CORS(app)
+app = Flask(__name__, static_folder=".") #creates the actual server, static_folder "." serves index.html
+CORS(app) #turns on the cross-origin permission so the browser can make API calls
 
 client = OpenAI(api_key=os.environ.get("OPENAI_API_KEY"))
 
@@ -22,6 +22,7 @@ client = OpenAI(api_key=os.environ.get("OPENAI_API_KEY"))
 # When someone asks a question, we find the relevant chunks and send them to
 # OpenAI so it can answer as Adithiya, grounded in real facts.
 
+#made via dictionary where each key is a scope
 KNOWLEDGE = {
     "education": """
         I'm studying Computer Engineering at Georgia Tech (BS, expected May 2028),
@@ -80,13 +81,16 @@ KNOWLEDGE = {
     """
 }
 
-ALL_SCOPES = list(KNOWLEDGE.keys())
+ALL_SCOPES = list(KNOWLEDGE.keys()) #Just makes a list of all scope names: ["education", "experience", "projects", "skills", "interests"]. Used later when someone has full access.
+
 
 # ── Share tokens ──────────────────────────────────────────────────────────────
 # Stored in memory (resets when the server restarts — fine for an MVP).
 # Each token is a dict: { id, label, scopes, use_count }
 
 tokens = {}  # token_id -> token dict
+#An empty dictionary that will store share tokens while the server is running. When you create a share link, it gets added here.
+#When you revoke it, it gets removed. Since it's just in memory, it resets every time you restart the server.
 
 
 def get_relevant_chunks(question, allowed_scopes):
