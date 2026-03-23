@@ -3,8 +3,6 @@
 A digital twin MVP built for the Viven AI take-home assessment.
 **Phase 2 deep-dive: Twin Sharing.**
 
-#Test Commit
-
 ---
 
 ## How to run
